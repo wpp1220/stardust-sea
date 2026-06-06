@@ -6,7 +6,9 @@ let wsConnected = false;
 
 function initWebSocket() {
   try {
-    socket = io('http://localhost:3000', {
+    // 自动检测服务器地址（本地开发用页面地址，生产环境自动适配）
+    const serverUrl = window.location.origin;
+    socket = io(serverUrl, {
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 3000

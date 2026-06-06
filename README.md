@@ -46,7 +46,38 @@ pm2 save
 pm2 startup
 ```
 
-### 方案二：Docker 部署
+### 方案二：Render 部署（推荐，固定 URL）
+
+将代码推送到 GitHub，通过 Render 自动部署，获得稳定的 `*.onrender.com` 域名。
+
+**步骤：**
+
+1. **创建 GitHub 仓库**（公开或私有均可）
+2. **推送代码：**
+   ```bash
+   cd stardust-sea
+   git remote add origin https://github.com/<你的用户名>/<仓库名>.git
+   git branch -M main
+   git push -u origin main
+   ```
+3. **登录 [Render Dashboard](https://dashboard.render.com)**
+4. **点击「New +」→「Web Service」**
+5. **连接你的 GitHub 仓库**
+6. **填写配置：**
+   - **Name:** `stardust-sea`（将获得 `stardust-sea.onrender.com`）
+   - **Region:** `Singapore`（亚太节点，国内访问较快）
+   - **Branch:** `main`
+   - **Runtime:** `Node`
+   - **Build Command:** `cd backend && npm install`
+   - **Start Command:** `node backend/server.js`
+   - **Plan:** `Free`
+7. **点击「Create Web Service」**
+8. 等待几分钟，部署完成后即可访问 `https://stardust-sea.onrender.com`
+
+> ⚠️ **注意：** Render Free 计划使用临时文件系统，SQLite 数据会在服务重启后重置。
+> 如需持久化数据，建议后续迁移到 PostgreSQL（Render 免费提供 1GB）。
+
+### 方案三：Docker 部署
 
 创建 `Dockerfile`：
 

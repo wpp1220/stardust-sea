@@ -1,0 +1,16 @@
+# 星尘之海 · Render 部署配置
+# 连接 GitHub 仓库后，Render 会自动检测此文件
+# 也可手动创建 Web Service，看 README 中的手动步骤
+
+services:
+  - type: web
+    name: stardust-sea
+    env: node
+    region: singapore  # 亚太节点，国内访问较快
+    plan: free
+    buildCommand: cd backend && npm install
+    startCommand: node backend/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 20

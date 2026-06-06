@@ -1,0 +1,14 @@
+{
+  "name": "stardust-sea",
+  "version": "1.2.0",
+  "description": "星尘之海 · 匿名倾诉网页应用",
+  "scripts": {
+    "start": "node backend/server.js",
+    "build": "cd backend && npm install"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "license": "MIT"
+}
