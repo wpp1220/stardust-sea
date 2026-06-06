@@ -1,0 +1,19 @@
+{
+  "name": "stardust-sea-backend",
+  "version": "1.2.0",
+  "description": "星尘之海 · 后端服务",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^4.22.2",
+    "helmet": "^7.2.0",
+    "socket.io": "^4.8.3",
+    "sql.js": "^1.14.1",
+    "uuid": "^9.0.1"
+  }
+}

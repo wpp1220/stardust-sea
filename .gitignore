@@ -1,0 +1,21 @@
+# Node.js
+node_modules/
+*.log
+npm-debug.log*
+.env
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build
+dist/
+build/
+.cache/
+
+# OS
+Thumbs.db
+Desktop.ini

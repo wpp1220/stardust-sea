@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>星尘之海</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      overflow: hidden;
+      background: #02040e;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      user-select: none;
+    }
+    canvas { display: block; }
+
+    /* ─── 首页（深沉入口）─── */
+    #landing {
+      position: fixed; inset: 0; z-index: 300;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: #02040e;
+      transition: opacity 2s ease;
+    }
+    #landing.hidden { opacity: 0; pointer-events: none; }
+
+    #landing .divider {
+      width: 1px; height: 100px;
+      background: linear-gradient(to bottom, transparent, rgba(140,180,255,0.3), transparent);
+      animation: dividerBreath 4s ease-in-out infinite;
+    }
+    @keyframes dividerBreath {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50% { opacity: 0.8; transform: scaleY(1.15); }
+    }
+
+    #landing h1 {
+      color: rgba(200,215,240,0.9);
+      font-size: 22px; font-weight: 300;
+      letter-spacing: 18px; margin-top: 32px;
+      animation: titleFade 2s ease-out;
+    }
+    @keyframes titleFade {
+      from { opacity: 0; letter-spacing: 30px; }
+      to { opacity: 1; letter-spacing: 18px; }
+    }
+
+    #landing .sub {
+      color: rgba(160,185,220,0.4);
+      font-size: 12px; letter-spacing: 6px;
+      margin-top: 20px;
+      animation: subFade 3s ease-out;
+    }
+    @keyframes subFade {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    #landing .sub2 {
+      color: rgba(160,185,220,0.3);
+      font-size: 11px; letter-spacing: 3px;
+      margin-top: 10px;
+      animation: sub2Fade 4s ease-out;
+    }
+    @keyframes sub2Fade {
+      from { opacity: 0; }
+      50% { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    #landing .enter-btn {
+      margin-top: 60px;
+      padding: 12px 40px;
+      background: transparent;
+      border: 1px solid rgba(140,180,255,0.2);
+      border-radius: 24px;
+      color: rgba(200,215,240,0.6);
+      font-size: 13px; letter-spacing: 6px;
+      cursor: pointer;
+      transition: all 1.2s ease;
+      font-family: inherit;
+      animation: btnAppear 4s ease-out;
+    }
+    @keyframes btnAppear {
+      from { opacity: 0; transform: translateY(20px); }
+      60% { opacity: 0; }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    #landing .enter-btn:hover {
+      background: rgba(140,180,255,0.08);
+      border-color: rgba(140,180,255,0.4);
+      color: rgba(200,215,240,0.9);
+      box-shadow: 0 0 40px rgba(100,140,255,0.15);
+    }
+
+    #landing .bottom-note {
+      position: absolute; bottom: 40px;
+      color: rgba(160,185,220,0.15);
+      font-size: 11px; letter-spacing: 4px;
+    }
+
+    /* ─── 主界面（极简）─── */
+    #main {
+      position: fixed; inset: 0;
+      opacity: 0; transition: opacity 2s ease;
+      pointer-events: none;
+    }
+    #main.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #logo {
+      position: fixed; top: 28px; left: 32px; z-index: 100;
+      color: rgba(180,200,230,0.25);
+      font-size: 12px; letter-spacing: 8px;
+      font-weight: 300;
+      pointer-events: none;
+      transition: opacity 2s;
+    }
+
+    #actions {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; justify-content: center; gap: 20px;
+      padding: 28px 24px; z-index: 100;
+      background: linear-gradient(to top, rgba(2,4,14,0.6), transparent);
+      opacity: 0; transition: opacity 2s ease;
+      pointer-events: none;
+    }
+    #main.show #actions { opacity: 1; pointer-events: auto; }
+
+    #actions button {
+      background: transparent;
+      border: none;
+      color: rgba(180,200,230,0.35);
+      font-size: 12px; letter-spacing: 4px;
+      cursor: pointer; padding: 10px 20px;
+      transition: all 0.8s ease;
+      font-family: inherit;
+    }
+    #actions button:hover {
+      color: rgba(200,215,240,0.8);
+      text-shadow: 0 0 20px rgba(140,180,255,0.3);
+    }
+    #actions .tell-btn {
+      color: rgba(180,200,230,0.6);
+      border: 1px solid rgba(140,180,255,0.15);
+      border-radius: 20px;
+      padding: 10px 32px;
+      letter-spacing: 6px;
+      font-size: 13px;
+    }
+    #actions .tell-btn:hover {
+      border-color: rgba(140,180,255,0.35);
+      background: rgba(140,180,255,0.06);
+    }
+
+    #hint {
+      position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+      color: rgba(180,200,230,0.15);
+      font-size: 11px; letter-spacing: 3px;
+      z-index: 50; pointer-events: none;
+      white-space: nowrap;
+      transition: opacity 2s;
+    }
+
+    /* ─── Modal ─── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(2,4,14,0.65);
+      backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      animation: fadeIn 0.8s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .modal {
+      background: rgba(10,16,36,0.85);
+      border: 1px solid rgba(140,180,255,0.1);
+      border-radius: 16px;
+      padding: 36px;
+      max-width: 460px; width: 90%;
+      max-height: 80vh; overflow-y: auto;
+      animation: modalIn 0.8s ease;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    }
+    .modal h2 {
+      color: rgba(200,215,240,0.8);
+      font-size: 16px; font-weight: 300; letter-spacing: 6px;
+      margin-bottom: 20px; text-align: center;
+    }
+    .modal textarea {
+      width: 100%; height: 160px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(140,180,255,0.12);
+      border-radius: 10px;
+      color: rgba(200,215,240,0.75);
+      padding: 18px; font-size: 14px; line-height: 1.8;
+      resize: none; outline: none;
+      font-family: inherit;
+      transition: border-color 0.8s;
+    }
+    .modal textarea:focus {
+      border-color: rgba(140,180,255,0.3);
+    }
+    .modal .char-count {
+      text-align: right; color: rgba(180,200,230,0.25);
+      font-size: 11px; margin-top: 6px;
+    }
+    .modal .btn-row {
+      display: flex; gap: 12px; justify-content: center; margin-top: 22px;
+    }
+    .modal button {
+      padding: 10px 28px;
+      border-radius: 20px;
+      font-size: 13px; letter-spacing: 3px;
+      cursor: pointer; transition: all 0.8s;
+      font-family: inherit;
+    }
+    .btn-primary {
+      background: rgba(140,180,255,0.1);
+      border: 1px solid rgba(140,180,255,0.25);
+      color: rgba(200,215,240,0.8);
+    }
+    .btn-primary:hover {
+      background: rgba(140,180,255,0.2);
+      box-shadow: 0 0 30px rgba(100,140,255,0.15);
+    }
+    .btn-ghost {
+      background: none; border: 1px solid rgba(255,255,255,0.08);
+      color: rgba(180,200,230,0.4);
+    }
+    .btn-ghost:hover { color: rgba(180,200,230,0.7); border-color: rgba(255,255,255,0.2); }
+
+    .fragment-content {
+      color: rgba(200,215,240,0.75);
+      font-size: 14px; line-height: 2; letter-spacing: 1px;
+      padding: 16px; margin-bottom: 16px;
+      border-left: 1px solid rgba(140,180,255,0.2);
+    }
+    .reply-list { margin-top: 16px; }
+    .reply-item {
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      color: rgba(180,200,230,0.55);
+      font-size: 12px; line-height: 1.8;
+    }
+    .reply-item .location {
+      font-size: 10px; color: rgba(180,200,230,0.2);
+      margin-top: 4px;
+    }
+    .stage-badge {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 10px;
+      font-size: 10px; letter-spacing: 2px;
+      background: rgba(140,180,255,0.08);
+      color: rgba(180,200,230,0.6);
+      margin-bottom: 14px;
+    }
+    .key-display {
+      text-align: center; padding: 24px;
+    }
+    .key-display .poem-key {
+      font-size: 20px; color: rgba(180,200,240,0.85);
+      letter-spacing: 6px; margin: 18px 0;
+    }
+    .key-display .warning {
+      color: rgba(255,200,150,0.55);
+      font-size: 11px; margin-top: 18px; line-height: 1.8;
+    }
+    .modal::-webkit-scrollbar { width: 3px; }
+    .modal::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+    @media (max-width: 600px) {
+      .modal { padding: 24px; }
+      #landing h1 { font-size: 18px; letter-spacing: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── 深沉入口 ─── -->
+  <div id="landing">
+    <div class="divider"></div>
+    <h1>星 尘 之 海</h1>
+    <p class="sub">心事是一颗孤独的微行星</p>
+    <p class="sub2">这里没有对与错，没有人认识你，只有你自己</p>
+    <button class="enter-btn" id="enterBtn">进 入</button>
+    <div class="bottom-note">✦</div>
+  </div>
+
+  <!-- ─── 主界面 ─── -->
+  <div id="main">
+    <div id="logo" onclick="triggerAdminEntry()">✦ 星 尘 之 海</div>
+    <div id="actions">
+      <button onclick="openMyStardust()">我的星尘</button>
+      <button onclick="startGuardianReview()">守护者</button>
+      <button class="tell-btn" onclick="openTellModal()">寄出碎片</button>
+      <button onclick="showGuardianLeaderboard()">排行榜</button>
+      <button onclick="openAbout()">关于</button>
+    </div>
+    <div id="sendHint" style="position:fixed;bottom:90px;left:50%;transform:translateX(-50%);z-index:50;font-size:10px;letter-spacing:2px;color:rgba(180,200,230,0.2);pointer-events:none;transition:opacity 2s;">本周剩余 3/3 次</div>
+    <div id="hint">拖拽漫游 · 滚轮缩放 · 点击碎片阅读</div>
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <div id="modals"></div>
+
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
